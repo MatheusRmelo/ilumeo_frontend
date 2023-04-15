@@ -12,18 +12,40 @@ export default function RegistersView(){
     const controller = new RegisterController();
     const [registers, setRegisters] = useState<IRegisterByDay[]>([]);
     const [currentRegister, setCurrentRegister] = useState<IRegisterByDay|null>(null);
+    const [currentHours, setCurrentHours] = useState("");
     const [loading, setLoading] = useState(false);
+    const [date, setDate] = useState(new Date());
     const status = useMemo(() => currentStatus(currentRegister), [currentRegister]);
 
     useEffect(()=>{
         getRegisters();
     }, []);
 
+    useEffect(()=>{
+        if(currentRegister){
+            setCurrentHours(Utils.getHoursByDay(currentRegister));
+        }
+    }, [currentRegister]);
+
+    useEffect(()=>{
+        const timerId = setInterval(refreshClock, 1000);
+        return function cleanup() {
+            clearInterval(timerId);
+        };
+    });
+
+    const refreshClock = () => {
+        if(currentRegister && Utils.isInProgress(currentRegister.registers)){
+            setCurrentHours(Utils.getHoursByDay(currentRegister));
+        }
+        setDate(new Date());
+    }
+
     const getRegisters = async () => {
         var response = await controller.getRegisters();
         if(response.success){
-            setRegisters(response.data!.data.filter((element)=>element.day != new Date().toLocaleDateString('pt-BR')));
-            let current = response.data!.data.find((element)=>element.day == new Date().toLocaleDateString('pt-BR'));
+            setRegisters(response.data!.data.filter((element)=>!Utils.isCurrentDay(element.day)));
+            let current = response.data!.data.find((element)=>Utils.isCurrentDay(element.day));
             if(current){
                 setCurrentRegister(current);
             }
@@ -46,7 +68,6 @@ export default function RegistersView(){
             }else{
                 let register = currentRegister;
                 register?.registers.unshift(response.data!);
-                console.log(register);
                 setCurrentRegister({...register});
             }
         }else{
@@ -59,7 +80,10 @@ export default function RegistersView(){
         <Container>
             <div className='registers-area'>
                 <div className="registers-header">
-                    <h4>Relógio de ponto</h4>
+                    <div>
+                        <h4>Relógio de ponto</h4>
+                        {date.toLocaleTimeString()}
+                    </div>
                     <div className='user-details'>
                         <h4>#{localStorage.getItem("code")}</h4>
                         <small>Usuário</small>
@@ -69,7 +93,7 @@ export default function RegistersView(){
                     <h2>
                         {
                             currentRegister == null ? "0h 00m" : 
-                            Utils.differenceHoursBetweenDates(currentRegister.registers.map((element)=>new Date(element.register_at)))
+                            currentHours 
                         }
                     </h2>
                     <h4>Horas de hoje</h4>
