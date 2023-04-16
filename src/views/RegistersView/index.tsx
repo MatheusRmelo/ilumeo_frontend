@@ -7,15 +7,17 @@ import RegisterController from '../../controllers/RegisterController';
 import DayCard from '../../components/DayCard';
 import Utils from '../../utils/utils';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 export default function RegistersView(){
     const controller = new RegisterController();
+    const navigate = useNavigate();
     const [registers, setRegisters] = useState<IRegisterByDay[]>([]);
     const [currentRegister, setCurrentRegister] = useState<IRegisterByDay|null>(null);
     const [currentHours, setCurrentHours] = useState("");
     const [loading, setLoading] = useState(false);
     const [date, setDate] = useState(new Date());
-    const status = useMemo(() => currentStatus(currentRegister), [currentRegister]);
+    const status = useMemo(() => controller.currentStatus(currentRegister), [currentRegister]);
 
     useEffect(()=>{
         getRegisters();
@@ -23,7 +25,7 @@ export default function RegistersView(){
 
     useEffect(()=>{
         if(currentRegister){
-            setCurrentHours(Utils.getHoursByDay(currentRegister));
+            setCurrentHours(controller.getHoursByDay(currentRegister));
         }
     }, [currentRegister]);
 
@@ -35,8 +37,8 @@ export default function RegistersView(){
     });
 
     const refreshClock = () => {
-        if(currentRegister && Utils.isInProgress(currentRegister.registers)){
-            setCurrentHours(Utils.getHoursByDay(currentRegister));
+        if(currentRegister && controller.isInProgress(currentRegister.registers)){
+            setCurrentHours(controller.getHoursByDay(currentRegister));
         }
         setDate(new Date());
     }
@@ -44,11 +46,13 @@ export default function RegistersView(){
     const getRegisters = async () => {
         var response = await controller.getRegisters();
         if(response.success){
-            setRegisters(response.data!.data.filter((element)=>!Utils.isCurrentDay(element.day)));
-            let current = response.data!.data.find((element)=>Utils.isCurrentDay(element.day));
+            setRegisters(response.data!.data.filter((element)=>!controller.isCurrentDay(element.day)));
+            let current = response.data!.data.find((element)=>controller.isCurrentDay(element.day));
             if(current){
                 setCurrentRegister(current);
             }
+        }else if(response.status == 401){
+            logout();
         }
     }
 
@@ -76,9 +80,20 @@ export default function RegistersView(){
         setLoading(false);
     }
 
+    const logout = () => {
+        navigate("/");
+        localStorage.setItem("token", "");
+        localStorage.setItem("code", "");
+    }
+
     return (
         <Container>
             <div className='registers-area'>
+                <div className='logout-button'>
+                    <Button onClick={()=>logout()}>
+                        Sair
+                    </Button>
+                </div>
                 <div className="registers-header">
                     <div>
                         <h4>Relógio de ponto</h4>
@@ -114,7 +129,3 @@ export default function RegistersView(){
     )
 }
 
-const currentStatus = (day: IRegisterByDay | null) : string => {
-    if(day == null || day.registers.length == 0) return "entry";
-    return day.registers[0].status == 'entry' ? 'leave' : 'entry';
-}

@@ -1,6 +1,15 @@
 .login-area {
     width: 30%;
     height: auto;
+}
 
-    max-width: 400px;
+@media only screen and (max-width: 1200px) {
+    .login-area {
+        width: 60%;
+    }
+}
+@media only screen and (max-width: 767px) {
+    .login-area {
+        width: 80%;
+    }
 }

@@ -21,7 +21,8 @@ export default class Controller {
             return {
                 data: response.data,
                 message: 'Sucesso',
-                success: true
+                success: true,
+                status: response.status,
             }
         }catch(err){
             if(err instanceof AxiosError){
@@ -30,11 +31,14 @@ export default class Controller {
                     message: response?.data.message ?? err.message,
                     success: false,
                     errors: response?.data.errors ?? [],
+                    status: response?.status ?? 500,
+
                 }
             }
             return {
                 message: "Falha desconhecida",
                 success: false,
+                status: 500,
             }
         }
     }
@@ -50,7 +54,8 @@ export default class Controller {
             return {
                 data: response.data,
                 message: 'Sucesso',
-                success: true
+                success: true,
+                status: response.status,
             }
         }catch(err){
             if(err instanceof AxiosError){
@@ -59,11 +64,13 @@ export default class Controller {
                     message: response?.data.message ?? err.message,
                     success: false,
                     errors: response?.data.errors ?? [],
+                    status: response?.status ?? 500,
                 }
             }
             return {
                 message: "Falha desconhecida",
                 success: false,
+                status: 500
             }
         }
     }

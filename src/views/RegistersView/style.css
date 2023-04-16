@@ -43,3 +43,22 @@
     overflow: auto;
     margin-top: 16px;
 }
+
+.registers-area > .logout-button {
+    position: fixed;
+    width: 64px;
+    bottom: 16px; 
+    right: 16px;
+}
+
+
+@media only screen and (max-width: 1200px) {
+    .registers-area {
+        width: 60%;
+    }
+}
+@media only screen and (max-width: 767px) {
+    .registers-area {
+        width: 80%;
+    }
+}

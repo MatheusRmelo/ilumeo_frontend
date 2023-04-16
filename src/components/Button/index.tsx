@@ -6,7 +6,7 @@ type Props = {
     variant?: 'solid' | 'outlined' | 'text',
     disabled?: boolean,
     isLoading?: boolean,
-    onClick?: () => {},
+    onClick?: () => void,
 }
 
 export default function Button({children, onClick, variant = 'solid', isLoading = false, disabled = false}: Props){
