@@ -8,9 +8,10 @@ import DayCard from '../../components/DayCard';
 import Utils from '../../utils/utils';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import useController from '../../hooks/useController';
 
 export default function RegistersView(){
-    const controller = new RegisterController();
+    const controller = useController(RegisterController);
     const navigate = useNavigate();
     const [registers, setRegisters] = useState<IRegisterByDay[]>([]);
     const [currentRegister, setCurrentRegister] = useState<IRegisterByDay|null>(null);
@@ -65,9 +66,6 @@ export default function RegistersView(){
                     day: new Date().toLocaleDateString('pt-BR'),
                     registers: [response.data!]
                 }
-                let newRegisters = [...registers];
-                newRegisters.unshift(register);
-                setRegisters([...newRegisters]);
                 setCurrentRegister({...register});
             }else{
                 let register = currentRegister;

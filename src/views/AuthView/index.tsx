@@ -7,9 +7,10 @@ import Button from "../../components/Button";
 import AuthController from "../../controllers/AuthController";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import useController from "../../hooks/useController";
 
 export default function AuthView(){
-    const controller = new AuthController();
+    const controller = useController(AuthController);
     const navigate = useNavigate();
     const [code, setCode] = useState("");
     const [loading, setLoading] = useState(false);
