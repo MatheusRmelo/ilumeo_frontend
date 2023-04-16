@@ -1,14 +1,15 @@
 import React, { useMemo } from "react";
 import './style.css';
 import IRegisterByDay from "../../models/RegisterModel";
-import Utils from "../../utils/utils";
+import RegisterController from "../../controllers/RegisterController";
 
 type Props = {
     day: IRegisterByDay,
 }
 
 export default function DayCard({day} : Props){
-    const time = useMemo(() => Utils.getHoursByDay(day), [day]);
+    const controller = new RegisterController();
+    const time = useMemo(() => controller.getHoursByDay(day), [day]);
 
     return (
         <div className="day-card">
