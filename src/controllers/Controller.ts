@@ -6,7 +6,7 @@ export default class Controller {
 
     constructor(){
         this.client = axios.create({
-            baseURL: import.meta.env.VITE_BASE_URL,
+            baseURL: import.meta.env.VITE_BASE_URL || "http://localhost:3000",
         });
     }
 
